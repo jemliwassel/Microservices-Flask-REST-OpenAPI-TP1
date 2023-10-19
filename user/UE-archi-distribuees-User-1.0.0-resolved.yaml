@@ -1,0 +1,148 @@
+---
+openapi: 3.1.0
+info:
+  title: User API
+  description: This is the API of the User service
+  contact:
+    email: helene.coullon@imt-atlantique.fr
+  license:
+    name: GPL v3
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  version: 1.0.0
+tags:
+  - name: admins
+    description: Secured Admin-only calls
+  - name: developers
+    description: Operations available to regular developers
+paths:
+  /:
+    get:
+      tags:
+        - developers
+      summary: home page of the service
+      operationId: home
+      responses:
+        "200":
+          description: welcome message
+          content:
+            text/html:
+              schema:
+                type: string
+                example: <h1>Test</h1>
+  /user/{user_id}:
+    get:
+      tags:
+        - developers
+      summary: get user information
+      operationId: get_user_infos
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+  /user/reeservations/{user_id}:
+    get:
+      tags:
+        - developers
+      summary: Get user reservations
+      operationId: get_user_reservation
+      parameters:
+        - in: path
+          name: user_id
+          description: user id.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: date
+          schema:
+            type: string
+          description: Reservation date
+      responses:
+        "200":
+          description: Reservation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "400":
+          description: bad input parameter
+  /user/reservation_details/{user_id}:
+    get:
+      tags:
+        - developers
+      summary: Get user reservation details
+      operationId: get_user_reservation_details
+      parameters:
+        - in: path
+          name: user_id
+          description: user id.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: date
+          schema:
+            type: string
+          description: Reservation date
+      responses:
+        "200":
+          description: Reservation details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationDetails"
+        "400":
+          description: bad input parameter
+
+components:
+  schemas:
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        last_active:
+          type: integer
+
+    Reservation:
+      type: object
+      properties:
+        date:
+          type: string
+          example: "20151130"
+        movies:
+          type: array
+          items:
+            type: string
+            example: 720d006c-3a57-4b6a-b18f-9b713b073f3c
+
+    ReservationDetails:
+      type: object
+      properties:
+        date:
+          type: string
+        movies:
+          type: array
+          items:
+            $ref: "#/components/schemas/MovieInfo"
+
+    MovieInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        director:
+          type: string
