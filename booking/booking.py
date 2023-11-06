@@ -30,6 +30,7 @@ def get_booking_for_user(user_id):
 @app.route("/bookings/<user_id>", methods=["POST"])
 def add_booking_byuser(user_id):
     req = request.get_json()
+    reservation_added = False
     if "date" not in req or "movies" not in req:
         return make_response(jsonify({"error": "Invalid request data"}), 409)
     date = req["date"]
@@ -44,16 +45,18 @@ def add_booking_byuser(user_id):
                 if dates["date"] == date:
                     if movie_id_to_book not in dates["movies"]:
                         dates["movies"].append(movie_id_to_book)
+                        reservation_added = True
                     else :
                         return make_response(jsonify({"error": "Movie ID already exists for the date."}), 409)
                 else:
                     booking["dates"].append({"date": date, "movies": [movie_id_to_book]})
-            return make_response(jsonify({"message": "Booking added"}), 200) 
-    new_booking = {
-        "user_id": user_id,
-        "dates": [{"date": date, "movies": [movie_id_to_book]}]
-    }
-    bookings.append(new_booking)
+                    reservation_added = True
+    if not reservation_added:
+        new_booking = {
+            "user_id": user_id,
+            "dates": [{"date": date, "movies": [movie_id_to_book]}]
+        }
+        bookings.append(new_booking)
     with open("databases/bookings.json", "w") as jsf:
         json.dump({"bookings": bookings}, jsf)
     return make_response(jsonify({"message": "Booking added Successfully"}), 200)
