@@ -66,7 +66,7 @@ def update_movie_rating(movie_id, rate):
             res = make_response(jsonify(movie), 200)
             return res
 
-    res = make_response(jsonify({"error": "movie ID not found"}), 201)
+    res = make_response(jsonify({"error": "movie ID not found"}), 404)
     return res
 
 @app.route("/movies/<movie_id>", methods=["DELETE"])
